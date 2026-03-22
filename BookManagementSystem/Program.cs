@@ -1,6 +1,8 @@
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using Data;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
+using Repositories;
+using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,9 +10,13 @@ var connectionString = "mongodb://admin:password@mongodb:27017/bookstore?authSou
 
 var client = new MongoClient(connectionString);
 
-var collection = client.GetDatabase("bookstore").GetCollection<Healthcheck>("healthchecks");
-Healthcheck result = collection.Find(Builders<Healthcheck>.Filter.Empty).FirstOrDefault();
+builder.Services.AddDbContext<BookManagementSystemDbContext>(options => options.UseMongoDB(connectionString, "bookstore"));
 
+builder.Services.AddScoped<HealthcheckService>();
+
+builder.Services.AddScoped<HealthcheckRepository>();
+
+builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
@@ -23,23 +29,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/healthchecks", () =>
-{
-    return result;
-});
-
-app.MapGet("/helloworld", () =>
-{
-    return "Hello, World!";
-});
+app.MapControllers();
 
 app.Run();
-
-public class Healthcheck {
-
-    [BsonId]
-    public ObjectId Id { get; set; }
-
-    [BsonElement("status")]
-    public string status {get; set; }
-}
