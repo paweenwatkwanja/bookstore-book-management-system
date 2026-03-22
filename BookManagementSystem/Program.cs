@@ -1,16 +1,27 @@
 using Data;
+using Models;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 using Repositories;
 using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = "mongodb://admin:password@mongodb:27017/bookstore?authSource=admin";
+string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+if (environment == null)
+{
+    environment = "Development";
+}
 
-var client = new MongoClient(connectionString);
+IConfiguration configuration = new ConfigurationBuilder()
+  .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+  .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+  .AddEnvironmentVariables()
+  .Build();
 
-builder.Services.AddDbContext<BookManagementSystemDbContext>(options => options.UseMongoDB(connectionString, "bookstore"));
+MongoDBSettings mongoDBSettings = builder.Configuration.GetSection("MongoDBSettings").Get<MongoDBSettings>();
+
+builder.Services.AddDbContext<BookManagementSystemDbContext>(
+    options => options.UseMongoDB(mongoDBSettings.ConnectionString, mongoDBSettings.DatabaseName));
 
 builder.Services.AddScoped<HealthcheckService>();
 
