@@ -2,7 +2,7 @@ using Data;
 
 namespace Repositories;
 
-public class HealthcheckRepository
+public class HealthcheckRepository : IHealthcheckRepository
 {
     private readonly BookManagementSystemDbContext _bookManagementSystemDbContext;
 
