@@ -5,9 +5,9 @@ namespace Controllers;
 
 public class HealthcheckController : Controller
 {
-    private readonly HealthcheckService _healthcheckService;
+    private readonly IHealthcheckService _healthcheckService;
 
-    public HealthcheckController(HealthcheckService healthcheckService)
+    public HealthcheckController(IHealthcheckService healthcheckService)
     {
         _healthcheckService = healthcheckService;
     }
@@ -15,6 +15,6 @@ public class HealthcheckController : Controller
     [HttpGet("/healthchecks")]
     public async Task<IActionResult> GetHealthcheck()
     {
-        return Ok(_healthcheckService.GetHealthcheck());
+        return Ok(await _healthcheckService.GetHealthcheckAsync());
     }
 }

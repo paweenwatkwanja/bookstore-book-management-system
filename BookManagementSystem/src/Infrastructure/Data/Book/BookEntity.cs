@@ -1,8 +1,10 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.EntityFrameworkCore;
 
 namespace Data;
 
+[Collection("healthchecks")]
 public class BookEntity
 {
     [BsonId]

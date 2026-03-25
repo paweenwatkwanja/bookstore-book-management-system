@@ -5,35 +5,49 @@ namespace Repositories;
 
 public class BookRepository : IBookRepository
 {
-    private readonly BookManagementSystemDbContext _bookManagementSystemDbContext;
+    private readonly IMongoCollection<BookEntity> _bookCollection;
+    private const string collectionName = "books";
 
-    public BookRepository(BookManagementSystemDbContext bookManagementSystemDbContext)
+    public BookRepository(IMongoDatabase database)
     {
-        _bookManagementSystemDbContext = bookManagementSystemDbContext;
+        _bookCollection = database.GetCollection<BookEntity>(collectionName);
     }
 
     public async Task<List<BookEntity>?> GetBooksAsync(){
         FilterDefinition<BookEntity> filter = Builders<BookEntity>.Filter.Empty;
-        return await _bookManagementSystemDbContext.FindAsync<List<BookEntity>>(filter);
+        IAsyncCursor<BookEntity> cursor = await _bookCollection.FindAsync<BookEntity>(filter);
+        List<BookEntity> bookEntities =  await cursor.ToListAsync();
+        return bookEntities;
     }
 
     public async Task<BookEntity?> GetBookByIDAsync(string objectId){
         FilterDefinition<BookEntity> filter = Builders<BookEntity>.Filter.Eq(b => b.ObjectId, objectId);
-        return await _bookManagementSystemDbContext.FindAsync<BookEntity>(filter);
+        IAsyncCursor<BookEntity> cursor = await _bookCollection.FindAsync<BookEntity>(filter);
+        return await cursor.FirstOrDefaultAsync();
     }
 
     public async Task CreateBookAsync(BookEntity bookEntity){
-        await _bookManagementSystemDbContext.AddAsync<BookEntity>(bookEntity);
-        await _bookManagementSystemDbContext.SaveChangesAsync();
+        await _bookCollection.InsertOneAsync(bookEntity);
     }
 
-    public async Task UpdateBookAsync(BookEntity bookEntity){
-        _bookManagementSystemDbContext.Update<BookEntity>(bookEntity);
-        await _bookManagementSystemDbContext.SaveChangesAsync();
-    }
+    public async Task<BookEntity> UpdateBookAsync(string objectId, BookEntity bookEntity){
+        FilterDefinition<BookEntity> filter = Builders<BookEntity>.Filter.Eq(b => b.ObjectId, objectId);
+        UpdateDefinition<BookEntity> update =Builders<BookEntity>.Update
+            .Set(b => b.Title, bookEntity.Title)
+            .Set(b => b.Author, bookEntity.Author)
+            .Set(b => b.ISBN, bookEntity.ISBN)
+            .Set(b => b.Publisher, bookEntity.Publisher)
+            .Set(b => b.PublicationDate, bookEntity.PublicationDate);
 
-     public async Task DeletBookAsync(BookEntity bookEntity){
-        _bookManagementSystemDbContext.Books.Remove(bookEntity);
-        await _bookManagementSystemDbContext.SaveChangesAsync();
+        FindOneAndUpdateOptions<BookEntity, BookEntity> options = new FindOneAndUpdateOptions<BookEntity, BookEntity>{
+            ReturnDocument = ReturnDocument.After
+        };
+
+        BookEntity updatedBook = await _bookCollection.FindOneAndUpdateAsync<BookEntity>(filter, update, options);
+        return updatedBook;
+    }
+        
+     public async Task DeleteBookAsync(string objectId){
+        await _bookCollection.DeleteOneAsync(b => b.ObjectId == objectId);
     }
 }

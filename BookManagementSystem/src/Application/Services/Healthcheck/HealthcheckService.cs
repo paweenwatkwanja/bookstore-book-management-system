@@ -6,16 +6,16 @@ namespace Services;
 
 public class HealthcheckService : IHealthcheckService
 {
-    private readonly HealthcheckRepository _healthcheckRepository;
+    private readonly IHealthcheckRepository _healthcheckRepository;
 
-    public HealthcheckService(HealthcheckRepository healthcheckRepository)
+    public HealthcheckService(IHealthcheckRepository healthcheckRepository)
     {
         _healthcheckRepository = healthcheckRepository;
     }
 
-    public HealthcheckResponse GetHealthcheck()
+    public async Task<HealthcheckResponse> GetHealthcheckAsync()
     {
-        HealthcheckEntity healthcheckEntity = _healthcheckRepository.GetHealthcheck();
+        HealthcheckEntity healthcheckEntity = await _healthcheckRepository.GetHealthcheckAsync();
         HealthcheckResponse healthCheckResponse = new HealthcheckResponse()
         {
             ObjectId = healthcheckEntity.ObjectId,

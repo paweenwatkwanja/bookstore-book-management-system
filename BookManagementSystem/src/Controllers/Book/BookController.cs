@@ -4,43 +4,46 @@ using Services;
 
 namespace Controllers;
 
-[ApiController]
-[Route("api/")]
 public class BookController : Controller
 {
-    private readonly BookService _bookService;
-    public BookController(BookService bookService)
+    private readonly IBookService _bookService;
+    public BookController(IBookService bookService)
     {
         _bookService = bookService;
     }
 
-    [HttpGet("/books")]
+    [HttpGet("api/books")]
     public async Task<IActionResult> GetBooksAsync()
     {
-        return Ok(await _bookService.GetBooksAsync());
+        List<BookResponse> responses = await _bookService.GetBooksAsync();
+        return Ok(responses);
     }
 
-    [HttpGet("/books/{objectId}")]
+    [HttpGet("api/books/{objectId}")]
     public async Task<IActionResult> GetBookByIdAsync(string objectId)
     {
-        return Ok(await _bookService.GetBookByIdAsync(objectId));
+        BookResponse response = await _bookService.GetBookByIdAsync(objectId);
+        return Ok(response);
     }
 
-    [HttpPost("/books")]
+    [HttpPost("api/books")]
     public async Task<IActionResult> CreateBookAsync([FromBody] BookRequest bookRequest)
     {
-        return Ok(_bookService.CreateBookAsync(bookRequest));
+        await _bookService.CreateBookAsync(bookRequest);
+        return Ok();
     }
 
-    [HttpPut("/books/{objectId}")]
+    [HttpPut("api/books/{objectId}")]
     public async Task<IActionResult> UpdateBookAsync(string objectId, [FromBody] BookRequest bookRequest)
     {
-        return Ok(_bookService.UpdateBookAsync(objectId, bookRequest));
+        BookResponse response = await _bookService.UpdateBookAsync(objectId, bookRequest);
+        return Ok(response);
     }
 
-    [HttpDelete("/books/{objectId}")]
+    [HttpDelete("api/books/{objectId}")]
     public async Task<IActionResult> DeleteBookAsync(string objectId)
-    {       
-        return Ok(_bookService.DeleteBookAsync(objectId));
+    {   
+        await _bookService.DeleteBookAsync(objectId);
+        return Ok();
     }
 }

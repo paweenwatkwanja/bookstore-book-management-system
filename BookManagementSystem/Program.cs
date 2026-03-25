@@ -1,11 +1,10 @@
-using Data;
 using Models;
-using Microsoft.EntityFrameworkCore;
 using Repositories;
 using Services;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 if (environment == null)
@@ -20,22 +19,26 @@ IConfiguration configuration = new ConfigurationBuilder()
   .Build();
 
 MongoDBSettings? mongoDBSettings = builder.Configuration.GetSection("MongoDBSettings").Get<MongoDBSettings>();
-
-MongoClient mongoClient = new MongoClient(mongoDBSettings?.ConnectionString);
-
-builder.Services.AddDbContext<BookManagementSystemDbContext>(options => options.UseMongoDB(mongoClient, mongoDBSettings?.DatabaseName));
-
-builder.Services.AddScoped<IHealthcheckService, HealthcheckService>();
-builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddSingleton<IMongoClient>(sp =>
+    new MongoClient(mongoDBSettings?.ConnectionString));
+builder.Services.AddSingleton<IMongoDatabase>(sp =>
+    sp.GetRequiredService<IMongoClient>().GetDatabase(mongoDBSettings?.DatabaseName));
 
 builder.Services.AddScoped<IHealthcheckRepository, HealthcheckRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 
-builder.Services.AddControllers();
+builder.Services.AddScoped<IHealthcheckService, HealthcheckService>();
+builder.Services.AddScoped<IBookService, BookService>();
+
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.Formatting = Formatting.Indented;
+    });;
 
 builder.Services.AddOpenApi();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {

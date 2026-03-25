@@ -33,6 +33,7 @@ public class BookService : IBookService
                 bookResponses.Add(bookResponse);
             }
         }
+
         return bookResponses;
     }
 
@@ -54,7 +55,6 @@ public class BookService : IBookService
 
     public async Task CreateBookAsync(BookRequest bookRequest)
     {
-        // validate
         BookEntity bookEntity = new BookEntity()
         {
             Title = bookRequest.Title,
@@ -66,10 +66,8 @@ public class BookService : IBookService
         await _bookRepository.CreateBookAsync(bookEntity);
     }
 
-    public async Task UpdateBookAsync(string objectId, BookRequest bookRequest)
+    public async Task<BookResponse> UpdateBookAsync(string objectId, BookRequest bookRequest)
     {
-        // validate
-        // get
         BookEntity bookEntity = new BookEntity()
         {
             ObjectId = objectId,
@@ -79,17 +77,24 @@ public class BookService : IBookService
             Publisher = bookRequest.Publisher,
             PublicationDate = bookRequest.PublicationDate
         };
-        await _bookRepository.UpdateBookAsync(bookEntity);
+
+        BookEntity updatedBook = await _bookRepository.UpdateBookAsync(objectId, bookEntity);
+        
+        BookResponse bookResponse = new BookResponse();
+        if (bookEntity != null)
+        {
+            bookResponse.ObjectId = updatedBook.ObjectId;
+            bookResponse.Title = updatedBook.Title;
+            bookResponse.Author = updatedBook.Author;
+            bookResponse.ISBN = updatedBook.ISBN;
+            bookResponse.Publisher = updatedBook.Publisher;
+            bookResponse.PublicationDate = updatedBook.PublicationDate;
+        };
+        return bookResponse;
     }
 
      public async Task DeleteBookAsync(string objectId)
     {
-        // validate
-        // get?
-        BookEntity bookEntity = new BookEntity()
-        {
-            ObjectId = objectId
-        };
-        await _bookRepository.DeletBookAsync(bookEntity);
+        await _bookRepository.DeleteBookAsync(objectId);
     }
 }

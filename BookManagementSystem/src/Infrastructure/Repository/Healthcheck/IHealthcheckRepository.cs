@@ -4,5 +4,5 @@ namespace Repositories;
 
 public interface IHealthcheckRepository
 {
-    public HealthcheckEntity GetHealthcheck();
+  public Task<HealthcheckEntity> GetHealthcheckAsync();
 }

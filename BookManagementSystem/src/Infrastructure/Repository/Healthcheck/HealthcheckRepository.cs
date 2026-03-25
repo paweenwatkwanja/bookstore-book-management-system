@@ -1,18 +1,22 @@
 using Data;
+using MongoDB.Driver;
 
 namespace Repositories;
 
 public class HealthcheckRepository : IHealthcheckRepository
 {
-    private readonly BookManagementSystemDbContext _bookManagementSystemDbContext;
-
-    public HealthcheckRepository(BookManagementSystemDbContext bookManagementSystemDbContext)
+    private readonly IMongoCollection<HealthcheckEntity> _healthcheckCollection;
+    private const string collectionName = "healthchecks";
+    
+    public HealthcheckRepository(IMongoDatabase database)
     {
-        _bookManagementSystemDbContext = bookManagementSystemDbContext;
+        _healthcheckCollection = database.GetCollection<HealthcheckEntity>(collectionName);
     }
 
-    public HealthcheckEntity GetHealthcheck()
+    public async Task<HealthcheckEntity> GetHealthcheckAsync()
     {
-        return _bookManagementSystemDbContext.Healthchecks.FirstOrDefault();
+        FilterDefinition<HealthcheckEntity> filter = Builders<HealthcheckEntity>.Filter.Empty;
+        IAsyncCursor<HealthcheckEntity> cursor = await _healthcheckCollection.FindAsync<HealthcheckEntity>(filter);
+        return await cursor.FirstOrDefaultAsync();
     }
 }
