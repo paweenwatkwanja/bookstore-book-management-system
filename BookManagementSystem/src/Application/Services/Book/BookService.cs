@@ -33,22 +33,24 @@ public class BookService : IBookService
                 bookResponses.Add(bookResponse);
             }
         }
-
         return bookResponses;
     }
 
-    public async Task<BookResponse> GetBookByIdAsync(string objectId)
+    public async Task<BookResponse?> GetBookByIdAsync(string objectId)
     {
-        BookResponse bookResponse = new BookResponse();
+        BookResponse? bookResponse = null;
         BookEntity? bookEntity = await _bookRepository.GetBookByIDAsync(objectId);
-        if (bookEntity != null)
+        if (bookEntity != null) 
         {
-            bookResponse.ObjectId = bookEntity.ObjectId;
-            bookResponse.Title = bookEntity.Title;
-            bookResponse.Author = bookEntity.Author;
-            bookResponse.ISBN = bookEntity.ISBN;
-            bookResponse.Publisher = bookEntity.Publisher;
-            bookResponse.PublicationDate = bookEntity.PublicationDate;
+            bookResponse = new BookResponse()
+            {
+                ObjectId = bookEntity.ObjectId,
+                Title = bookEntity.Title,
+                Author = bookEntity.Author,
+                ISBN = bookEntity.ISBN,
+                Publisher = bookEntity.Publisher,
+                PublicationDate = bookEntity.PublicationDate
+            };
         };
         return bookResponse;
     }
@@ -70,7 +72,6 @@ public class BookService : IBookService
     {
         BookEntity bookEntity = new BookEntity()
         {
-            ObjectId = objectId,
             Title = bookRequest.Title,
             Author = bookRequest.Author,
             ISBN = bookRequest.ISBN,
@@ -93,7 +94,7 @@ public class BookService : IBookService
         return bookResponse;
     }
 
-     public async Task DeleteBookAsync(string objectId)
+    public async Task DeleteBookAsync(string objectId)
     {
         await _bookRepository.DeleteBookAsync(objectId);
     }

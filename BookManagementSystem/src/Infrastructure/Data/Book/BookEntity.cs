@@ -9,19 +9,19 @@ public class BookEntity
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string ObjectId { get; set; }
+    public string? ObjectId { get; set; }
 
     [BsonElement("title")]
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     [BsonElement("author")]
-    public string Author { get; set; }
+    public string? Author { get; set; }
 
     [BsonElement("isbn")]
-    public string ISBN { get; set; }
+    public string? ISBN { get; set; }
 
     [BsonElement("publisher")]
-    public string Publisher { get; set; }
+    public string? Publisher { get; set; }
 
     [BsonElement("publicationDate")]
     public DateOnly PublicationDate { get; set; }

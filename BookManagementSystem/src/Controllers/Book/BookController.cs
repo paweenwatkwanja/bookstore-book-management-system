@@ -4,6 +4,7 @@ using Services;
 
 namespace Controllers;
 
+[ApiController]  
 public class BookController : Controller
 {
     private readonly IBookService _bookService;
@@ -22,7 +23,11 @@ public class BookController : Controller
     [HttpGet("api/books/{objectId}")]
     public async Task<IActionResult> GetBookByIdAsync(string objectId)
     {
-        BookResponse response = await _bookService.GetBookByIdAsync(objectId);
+        if (!MongoDB.Bson.ObjectId.TryParse(objectId, out _))
+            return BadRequest("Invalid ID format");
+        BookResponse? response = await _bookService.GetBookByIdAsync(objectId);
+        if (response == null)
+            return NotFound();
         return Ok(response);
     }
 
@@ -30,12 +35,14 @@ public class BookController : Controller
     public async Task<IActionResult> CreateBookAsync([FromBody] BookRequest bookRequest)
     {
         await _bookService.CreateBookAsync(bookRequest);
-        return Ok();
+        return Created();
     }
 
     [HttpPut("api/books/{objectId}")]
     public async Task<IActionResult> UpdateBookAsync(string objectId, [FromBody] BookRequest bookRequest)
     {
+        if (!MongoDB.Bson.ObjectId.TryParse(objectId, out _))
+            return BadRequest("Invalid ID format");
         BookResponse response = await _bookService.UpdateBookAsync(objectId, bookRequest);
         return Ok(response);
     }
@@ -43,6 +50,8 @@ public class BookController : Controller
     [HttpDelete("api/books/{objectId}")]
     public async Task<IActionResult> DeleteBookAsync(string objectId)
     {   
+        if (!MongoDB.Bson.ObjectId.TryParse(objectId, out _))
+            return BadRequest("Invalid ID format");
         await _bookService.DeleteBookAsync(objectId);
         return Ok();
     }

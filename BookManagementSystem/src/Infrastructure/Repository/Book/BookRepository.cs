@@ -48,6 +48,6 @@ public class BookRepository : IBookRepository
     }
         
      public async Task DeleteBookAsync(string objectId){
-        await _bookCollection.DeleteOneAsync(b => b.ObjectId == objectId);
+        await _bookCollection.DeleteOneAsync<BookEntity>(b => b.ObjectId == objectId);
     }
 }
