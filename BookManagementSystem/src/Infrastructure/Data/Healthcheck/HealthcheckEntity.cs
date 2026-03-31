@@ -9,8 +9,8 @@ public class HealthcheckEntity
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string ObjectId { get; set; }
+    public string? ObjectId { get; set; }
 
     [BsonElement("status")]
-    public string Status { get; set; }
+    public string? Status { get; set; }
 }

@@ -4,5 +4,5 @@ namespace Services;
 
 public interface IHealthcheckService
 {
-  public HealthcheckResponse GetHealthcheck();
+  public Task<HealthcheckResponse> GetHealthcheckAsync();
 }
