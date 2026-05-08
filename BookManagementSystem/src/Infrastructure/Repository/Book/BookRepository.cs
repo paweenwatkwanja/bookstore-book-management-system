@@ -6,11 +6,15 @@ namespace Repositories;
 public class BookRepository : IBookRepository
 {
     private readonly IMongoCollection<BookEntity> _bookCollection;
-    private const string collectionName = "books";
+    private string _collectionName = "books";
 
-    public BookRepository(IMongoDatabase database)
+    public BookRepository(IMongoDatabase database, string? collectionName = null)
     {
-        _bookCollection = database.GetCollection<BookEntity>(collectionName);
+        if (collectionName != null)
+        {
+            _collectionName = collectionName;
+        }
+        _bookCollection = database.GetCollection<BookEntity>(_collectionName);
     }
 
     public async Task<List<BookEntity>?> GetBooksAsync(){
@@ -26,8 +30,9 @@ public class BookRepository : IBookRepository
         return await cursor.FirstOrDefaultAsync();
     }
 
-    public async Task CreateBookAsync(BookEntity bookEntity){
+    public async Task<string?> CreateBookAsync(BookEntity bookEntity){
         await _bookCollection.InsertOneAsync(bookEntity);
+        return bookEntity.ObjectId?.ToString();
     }
 
     public async Task<BookEntity> UpdateBookAsync(string objectId, BookEntity bookEntity){

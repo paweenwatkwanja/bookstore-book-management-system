@@ -10,7 +10,7 @@ public class BookService : IBookService
 
     public BookService(IBookRepository bookRepository)
     {
-         _bookRepository = bookRepository;
+        _bookRepository = bookRepository;
     }
 
     public async Task<List<BookResponse>> GetBooksAsync()
@@ -40,7 +40,7 @@ public class BookService : IBookService
     {
         BookResponse? bookResponse = null;
         BookEntity? bookEntity = await _bookRepository.GetBookByIDAsync(objectId);
-        if (bookEntity != null) 
+        if (bookEntity != null)
         {
             bookResponse = new BookResponse()
             {
@@ -51,11 +51,12 @@ public class BookService : IBookService
                 Publisher = bookEntity.Publisher,
                 PublicationDate = bookEntity.PublicationDate
             };
-        };
+        }
+        ;
         return bookResponse;
     }
 
-    public async Task CreateBookAsync(BookRequest bookRequest)
+    public async Task<string?> CreateBookAsync(BookRequest bookRequest)
     {
         BookEntity bookEntity = new BookEntity()
         {
@@ -65,10 +66,10 @@ public class BookService : IBookService
             Publisher = bookRequest.Publisher,
             PublicationDate = bookRequest.PublicationDate
         };
-        await _bookRepository.CreateBookAsync(bookEntity);
+        return await _bookRepository.CreateBookAsync(bookEntity);
     }
 
-    public async Task<BookResponse> UpdateBookAsync(string objectId, BookRequest bookRequest)
+    public async Task<BookResponse?> UpdateBookAsync(string objectId, BookRequest bookRequest)
     {
         BookEntity bookEntity = new BookEntity()
         {
@@ -80,17 +81,19 @@ public class BookService : IBookService
         };
 
         BookEntity updatedBook = await _bookRepository.UpdateBookAsync(objectId, bookEntity);
-        
+
         BookResponse bookResponse = new BookResponse();
-        if (bookEntity != null)
+
+        if (updatedBook == null)
         {
-            bookResponse.ObjectId = updatedBook.ObjectId;
-            bookResponse.Title = updatedBook.Title;
-            bookResponse.Author = updatedBook.Author;
-            bookResponse.ISBN = updatedBook.ISBN;
-            bookResponse.Publisher = updatedBook.Publisher;
-            bookResponse.PublicationDate = updatedBook.PublicationDate;
-        };
+            return null;
+        }
+        bookResponse.ObjectId = updatedBook.ObjectId;
+        bookResponse.Title = updatedBook.Title;
+        bookResponse.Author = updatedBook.Author;
+        bookResponse.ISBN = updatedBook.ISBN;
+        bookResponse.Publisher = updatedBook.Publisher;
+        bookResponse.PublicationDate = updatedBook.PublicationDate;
         return bookResponse;
     }
 
