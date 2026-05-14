@@ -26,9 +26,7 @@ public class BookController : Controller
     {
         if (!MongoDB.Bson.ObjectId.TryParse(objectId, out _))
             throw new BadRequestException("Invalid ID format");
-        BookResponse? response = await _bookService.GetBookByIdAsync(objectId);
-        if (response == null)
-            throw new NotFoundException("Book not found");
+        BookResponse response = await _bookService.GetBookByIdAsync(objectId);
         return response;
     }
 
