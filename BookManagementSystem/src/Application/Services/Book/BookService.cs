@@ -1,8 +1,8 @@
 using Data;
 using Models;
 using Repositories;
-using Global.Exceptions;
 using MongoDB.Driver;
+using Global.Exceptions;
 
 namespace Services;
 
@@ -12,7 +12,7 @@ public class BookService : IBookService
 
     public BookService(IBookRepository bookRepository)
     {
-         _bookRepository = bookRepository;
+        _bookRepository = bookRepository;
     }
 
     public async Task<List<BookResponse>> GetBooksAsync()
@@ -58,8 +58,12 @@ public class BookService : IBookService
         return bookResponse;
     }
 
-    public async Task CreateBookAsync(BookRequest bookRequest)
+    public async Task<string?> CreateBookAsync(BookRequest bookRequest)
     {
+        if (bookRequest == null)
+        {
+            throw new BadRequestException("Book request cannot be null.");
+        }
         BookEntity bookEntity = new BookEntity()
         {
             Title = bookRequest.Title,
@@ -68,11 +72,16 @@ public class BookService : IBookService
             Publisher = bookRequest.Publisher,
             PublicationDate = bookRequest.PublicationDate
         };
-        await _bookRepository.CreateBookAsync(bookEntity);
+        return await _bookRepository.CreateBookAsync(bookEntity);
     }
 
     public async Task<BookResponse> UpdateBookAsync(string objectId, BookRequest bookRequest)
     {
+        if (bookRequest == null)
+        {
+            throw new BadRequestException("Book request cannot be null.");
+        }
+
         BookEntity bookEntity = new BookEntity()
         {
             Title = bookRequest.Title,

@@ -7,7 +7,7 @@ public interface IBookRepository
 {
     public Task<List<BookEntity>?> GetBooksAsync();
     public Task<BookEntity?> GetBookByIDAsync(string objectId);
-    public Task CreateBookAsync(BookEntity bookEntity);
+    public Task<string?> CreateBookAsync(BookEntity bookEntity);
     public Task<BookEntity> UpdateBookAsync(string objectId, BookEntity bookEntity);
     public Task<DeleteResult> DeleteBookAsync(string objectId);
 }

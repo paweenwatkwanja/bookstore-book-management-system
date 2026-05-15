@@ -4,7 +4,7 @@ using MongoDB.EntityFrameworkCore;
 
 namespace Data;
 
-[Collection("healthchecks")]
+[Collection("books")]
 public class BookEntity
 {
     [BsonId]

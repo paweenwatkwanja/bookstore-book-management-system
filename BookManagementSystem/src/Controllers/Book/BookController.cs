@@ -5,8 +5,8 @@ using Global.Exceptions;
 
 namespace Controllers;
 
-[ApiController]  
-public class BookController : Controller
+[ApiController]
+public class BookController : ControllerBase
 {
     private readonly IBookService _bookService;
     public BookController(IBookService bookService)
@@ -31,9 +31,9 @@ public class BookController : Controller
     }
 
     [HttpPost("api/books")]
-    public async Task CreateBookAsync([FromBody] BookRequest bookRequest)
+    public async Task<string?> CreateBookAsync([FromBody] BookRequest bookRequest)
     {
-        await _bookService.CreateBookAsync(bookRequest);
+        return await _bookService.CreateBookAsync(bookRequest);
     }
 
     [HttpPut("api/books/{objectId}")]
