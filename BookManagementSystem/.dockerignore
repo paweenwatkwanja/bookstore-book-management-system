@@ -1,0 +1,11 @@
+bin/
+obj/
+.git
+.gitignore
+.vscode
+.idea
+*.md
+.env
+.env.*
+node_modules/
+npm-debug.log
