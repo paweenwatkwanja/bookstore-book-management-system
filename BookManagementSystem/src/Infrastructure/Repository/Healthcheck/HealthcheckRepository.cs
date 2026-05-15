@@ -15,8 +15,15 @@ public class HealthcheckRepository : IHealthcheckRepository
 
     public async Task<HealthcheckEntity> GetHealthcheckAsync()
     {
-        FilterDefinition<HealthcheckEntity> filter = Builders<HealthcheckEntity>.Filter.Empty;
-        IAsyncCursor<HealthcheckEntity> cursor = await _healthcheckCollection.FindAsync<HealthcheckEntity>(filter);
-        return await cursor.FirstOrDefaultAsync();
+        try
+        {
+            FilterDefinition<HealthcheckEntity> filter = Builders<HealthcheckEntity>.Filter.Empty;
+            IAsyncCursor<HealthcheckEntity> cursor = await _healthcheckCollection.FindAsync<HealthcheckEntity>(filter);
+            return await cursor.FirstOrDefaultAsync();
+        }
+        catch (MongoException ex)
+        {
+            throw new Exception($"Database error while retrieving healthcheck: {ex.Message}", ex);
+        }
     }
 }

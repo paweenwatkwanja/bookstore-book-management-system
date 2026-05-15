@@ -15,12 +15,24 @@ public class HealthcheckService : IHealthcheckService
 
     public async Task<HealthcheckResponse> GetHealthcheckAsync()
     {
-        HealthcheckEntity healthcheckEntity = await _healthcheckRepository.GetHealthcheckAsync();
-        HealthcheckResponse healthCheckResponse = new HealthcheckResponse()
+        try
         {
-            ObjectId = healthcheckEntity.ObjectId,
-            Status = healthcheckEntity.Status
-        };
-        return healthCheckResponse;
+            HealthcheckEntity? healthcheckEntity = await _healthcheckRepository.GetHealthcheckAsync();
+            if (healthcheckEntity == null)
+            {
+                throw new Exception("No healthcheck record found in database.");
+            }
+
+            HealthcheckResponse healthCheckResponse = new HealthcheckResponse()
+            {
+                ObjectId = healthcheckEntity.ObjectId,
+                Status = healthcheckEntity.Status
+            };
+            return healthCheckResponse;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error retrieving healthcheck: {ex.Message}", ex);
+        }
     }
 }

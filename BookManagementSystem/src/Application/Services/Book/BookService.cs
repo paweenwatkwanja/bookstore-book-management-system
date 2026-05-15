@@ -1,6 +1,8 @@
 using Data;
 using Models;
 using Repositories;
+using MongoDB.Driver;
+using Global.Exceptions;
 
 namespace Services;
 
@@ -36,23 +38,23 @@ public class BookService : IBookService
         return bookResponses;
     }
 
-    public async Task<BookResponse?> GetBookByIdAsync(string objectId)
+    public async Task<BookResponse> GetBookByIdAsync(string objectId)
     {
-        BookResponse? bookResponse = null;
         BookEntity? bookEntity = await _bookRepository.GetBookByIDAsync(objectId);
-        if (bookEntity != null)
+        if (bookEntity == null)
         {
-            bookResponse = new BookResponse()
-            {
-                ObjectId = bookEntity.ObjectId,
-                Title = bookEntity.Title,
-                Author = bookEntity.Author,
-                ISBN = bookEntity.ISBN,
-                Publisher = bookEntity.Publisher,
-                PublicationDate = bookEntity.PublicationDate
-            };
+            throw new NotFoundException($"Book with ID '{objectId}' not found.");
         }
-        ;
+
+        BookResponse bookResponse = new BookResponse()
+        {
+            ObjectId = bookEntity.ObjectId,
+            Title = bookEntity.Title,
+            Author = bookEntity.Author,
+            ISBN = bookEntity.ISBN,
+            Publisher = bookEntity.Publisher,
+            PublicationDate = bookEntity.PublicationDate
+        };
         return bookResponse;
     }
 
@@ -69,7 +71,7 @@ public class BookService : IBookService
         return await _bookRepository.CreateBookAsync(bookEntity);
     }
 
-    public async Task<BookResponse?> UpdateBookAsync(string objectId, BookRequest bookRequest)
+    public async Task<BookResponse> UpdateBookAsync(string objectId, BookRequest bookRequest)
     {
         BookEntity bookEntity = new BookEntity()
         {
@@ -80,25 +82,30 @@ public class BookService : IBookService
             PublicationDate = bookRequest.PublicationDate
         };
 
-        BookEntity updatedBook = await _bookRepository.UpdateBookAsync(objectId, bookEntity);
-
-        BookResponse bookResponse = new BookResponse();
-
+        BookEntity? updatedBook = await _bookRepository.UpdateBookAsync(objectId, bookEntity);
         if (updatedBook == null)
         {
-            return null;
+            throw new NotFoundException($"Book with ID '{objectId}' not found.");
         }
-        bookResponse.ObjectId = updatedBook.ObjectId;
-        bookResponse.Title = updatedBook.Title;
-        bookResponse.Author = updatedBook.Author;
-        bookResponse.ISBN = updatedBook.ISBN;
-        bookResponse.Publisher = updatedBook.Publisher;
-        bookResponse.PublicationDate = updatedBook.PublicationDate;
+
+        BookResponse bookResponse = new BookResponse()
+        {
+            ObjectId = updatedBook.ObjectId,
+            Title = updatedBook.Title,
+            Author = updatedBook.Author,
+            ISBN = updatedBook.ISBN,
+            Publisher = updatedBook.Publisher,
+            PublicationDate = updatedBook.PublicationDate
+        };
         return bookResponse;
     }
 
     public async Task DeleteBookAsync(string objectId)
     {
-        await _bookRepository.DeleteBookAsync(objectId);
+        DeleteResult deleteResult = await _bookRepository.DeleteBookAsync(objectId);
+        if (deleteResult.DeletedCount == 0)
+        {
+            throw new NotFoundException($"Book with ID '{objectId}' not found.");
+        }
     }
 }

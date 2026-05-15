@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services;
+using Global.Exceptions;
 
 namespace Controllers;
 
 [ApiController]
-public class BookController : Controller
+public class BookController : ControllerBase
 {
     private readonly IBookService _bookService;
     public BookController(IBookService bookService)
@@ -14,53 +15,41 @@ public class BookController : Controller
     }
 
     [HttpGet("api/books")]
-    public async Task<IActionResult> GetBooksAsync()
+    public async Task<List<BookResponse>> GetBooksAsync()
     {
         List<BookResponse> responses = await _bookService.GetBooksAsync();
-        return Ok(responses);
+        return responses;
     }
 
     [HttpGet("api/books/{objectId}")]
-    public async Task<IActionResult> GetBookByIdAsync(string objectId)
+    public async Task<BookResponse> GetBookByIdAsync(string objectId)
     {
         if (!MongoDB.Bson.ObjectId.TryParse(objectId, out _))
-            return BadRequest("Invalid ID format");
-        BookResponse? response = await _bookService.GetBookByIdAsync(objectId);
-        if (response == null)
-            return NotFound();
-        return Ok(response);
+            throw new BadRequestException("Invalid ID format");
+        BookResponse response = await _bookService.GetBookByIdAsync(objectId);
+        return response;
     }
 
     [HttpPost("api/books")]
-    public async Task<IActionResult> CreateBookAsync([FromBody] BookRequest bookRequest)
+    public async Task<string?> CreateBookAsync([FromBody] BookRequest bookRequest)
     {
-        if (bookRequest == null)
-            return BadRequest("Request is null");
-        string? objectId = await _bookService.CreateBookAsync(bookRequest);
-        return Ok(objectId);
+        return await _bookService.CreateBookAsync(bookRequest);
     }
 
     [HttpPut("api/books/{objectId}")]
-    public async Task<IActionResult> UpdateBookAsync(string objectId, [FromBody] BookRequest bookRequest)
+    public async Task<BookResponse> UpdateBookAsync(string objectId, [FromBody] BookRequest bookRequest)
     {
         if (!MongoDB.Bson.ObjectId.TryParse(objectId, out _))
-            return BadRequest("Invalid ID format");
-        if (bookRequest == null)
-            return BadRequest("Request is null");
-        BookResponse? response = await _bookService.UpdateBookAsync(objectId, bookRequest);
-        if (response == null)
-        {
-            return NotFound();
-        }
-        return Ok(response);
+            throw new BadRequestException("Invalid ID format");
+        BookResponse response = await _bookService.UpdateBookAsync(objectId, bookRequest);
+        return response;
     }
 
     [HttpDelete("api/books/{objectId}")]
-    public async Task<IActionResult> DeleteBookAsync(string objectId)
+    public async Task DeleteBookAsync(string objectId)
     {
         if (!MongoDB.Bson.ObjectId.TryParse(objectId, out _))
-            return BadRequest("Invalid ID format");
+            throw new BadRequestException("Invalid ID format");
         await _bookService.DeleteBookAsync(objectId);
-        return Ok();
     }
 }
