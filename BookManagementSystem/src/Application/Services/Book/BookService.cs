@@ -60,6 +60,10 @@ public class BookService : IBookService
 
     public async Task<string?> CreateBookAsync(BookRequest bookRequest)
     {
+        if (bookRequest == null)
+        {
+            throw new BadRequestException("Book request cannot be null.");
+        }
         BookEntity bookEntity = new BookEntity()
         {
             Title = bookRequest.Title,
@@ -73,6 +77,11 @@ public class BookService : IBookService
 
     public async Task<BookResponse> UpdateBookAsync(string objectId, BookRequest bookRequest)
     {
+        if (bookRequest == null)
+        {
+            throw new BadRequestException("Book request cannot be null.");
+        }
+
         BookEntity bookEntity = new BookEntity()
         {
             Title = bookRequest.Title,
