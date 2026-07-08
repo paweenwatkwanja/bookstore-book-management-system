@@ -65,7 +65,8 @@ public class BookRepository : IBookRepository
                 .Set(b => b.Author, bookEntity.Author)
                 .Set(b => b.ISBN, bookEntity.ISBN)
                 .Set(b => b.Publisher, bookEntity.Publisher)
-                .Set(b => b.PublicationDate, bookEntity.PublicationDate);
+                .Set(b => b.PublicationDate, bookEntity.PublicationDate)
+                .Set(b => b.ImageUrl, bookEntity.ImageUrl);
 
             FindOneAndUpdateOptions<BookEntity, BookEntity> options = new FindOneAndUpdateOptions<BookEntity, BookEntity>{
                 ReturnDocument = ReturnDocument.After
