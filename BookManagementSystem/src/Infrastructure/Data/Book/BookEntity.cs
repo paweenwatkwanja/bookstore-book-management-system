@@ -25,4 +25,7 @@ public class BookEntity
 
     [BsonElement("publicationDate")]
     public DateOnly PublicationDate { get; set; }
+
+    [BsonElement("imageUrl")]
+    public string? ImageUrl { get; set; }
 }

@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Models;
+﻿using Models;
 using Global.Exceptions;
 
 namespace BookManagementSystem.Test;
@@ -14,7 +13,8 @@ public sealed class BookServiceTest : MongoDbTestBase
             Author = author ?? "BookAuthor",
             ISBN = "BookISBN",
             Publisher = "BookPublisher",
-            PublicationDate = new DateOnly(2026, 1, 1)
+            PublicationDate = new DateOnly(2026, 1, 1),
+            ImageUrl = "http://example.com/image.jpg"
         };
 
     private static BookRequest CreateUpdateBookRequest() =>
@@ -24,7 +24,8 @@ public sealed class BookServiceTest : MongoDbTestBase
             Author = "BookAuthor1",
             ISBN = "BookISBN1",
             Publisher = "BookPublisher1",
-            PublicationDate = new DateOnly(2026, 1, 12)
+            PublicationDate = new DateOnly(2026, 1, 12),
+            ImageUrl = "http://example.com/image2.jpg"
         };
 
     [TestMethod]
@@ -67,6 +68,7 @@ public sealed class BookServiceTest : MongoDbTestBase
         Assert.AreEqual("BookISBN", actual.ISBN);
         Assert.AreEqual("BookPublisher", actual.Publisher);
         Assert.AreEqual(new DateOnly(2026, 1, 1), actual.PublicationDate);
+        Assert.AreEqual("http://example.com/image.jpg", actual.ImageUrl);
     }
 
     [TestMethod]
@@ -146,6 +148,7 @@ public sealed class BookServiceTest : MongoDbTestBase
         Assert.AreEqual("BookISBN1", bookResponse.ISBN);
         Assert.AreEqual("BookPublisher1", bookResponse.Publisher);
         Assert.AreEqual(new DateOnly(2026, 1, 12), bookResponse.PublicationDate);
+        Assert.AreEqual("http://example.com/image2.jpg", bookResponse.ImageUrl);
     }
 
     [TestMethod]

@@ -30,7 +30,8 @@ public class BookService : IBookService
                     Author = bookEntity.Author,
                     ISBN = bookEntity.ISBN,
                     Publisher = bookEntity.Publisher,
-                    PublicationDate = bookEntity.PublicationDate
+                    PublicationDate = bookEntity.PublicationDate,
+                    ImageUrl = bookEntity.ImageUrl
                 };
                 bookResponses.Add(bookResponse);
             }
@@ -104,7 +105,8 @@ public class BookService : IBookService
             Author = updatedBook.Author,
             ISBN = updatedBook.ISBN,
             Publisher = updatedBook.Publisher,
-            PublicationDate = updatedBook.PublicationDate
+            PublicationDate = updatedBook.PublicationDate,
+            ImageUrl = updatedBook.ImageUrl
         };
         return bookResponse;
     }

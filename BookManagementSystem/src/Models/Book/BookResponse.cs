@@ -21,4 +21,7 @@ public class BookResponse
 
     [JsonProperty("publication_date")]
     public DateOnly PublicationDate { get; set; }
+
+    [JsonProperty("image_url")]
+    public string? ImageUrl { get; set; }
 }
